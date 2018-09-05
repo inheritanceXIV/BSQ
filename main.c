@@ -16,6 +16,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+
+typedef struct s_list
+{
+	char			data;
+	struct s_list	*next;
+}				t_list;
+
 typedef struct	s_map_info
 {
 	int		size;
@@ -23,13 +30,10 @@ typedef struct	s_map_info
 	char	empty;
 	char 	obstacle;
 	char	full;
+	int		fd;
+	t_list	first_line;
 }				t_map_info;
 
-typedef struct s_list
-{
-	char			data;
-	struct s_list	*next;
-}				t_list;
 
 typedef	struct s_biggest
 {
@@ -43,6 +47,12 @@ typedef struct s_map
 	int		num;
 	char 	sym;
 }				t_map;
+
+typedef struct s_map_set
+{
+	struct s_map 	 *map;
+	struct s_biggest *square;
+}				t_map_set;
 
 t_biggest	*g_square;
 
@@ -261,47 +271,19 @@ t_map	**convert_map(t_map_info info, int fd, t_list first_line)
 		row++;
 	}
 	g_square = square;
-	//printf("row:%d col:%d dimension:%d\n",square->row, square->col, square->dimension);
 	return (map);
 }
 
-/**map util**/
 
-t_list	ft_read_first_line()
-
-
-int		ft_parse_argv()
+int		ft_read_first_line(t_map_info *map_info)
 {
-
-	int			in;
-	int			flag;
+	int			len;
 	char		buffer[4242];
-	t_map_info	*map_info;
-	int			i;
 	t_list		*first_line;
-	char		*info;
-	t_map		**converted_map;
 
-	i = 0;
-	info = malloc(sizeof(char) * 20);
-	in = open("example.txt", O_RDONLY);
-	if (-1 == in)
-		return (-1);
-
-	while ((flag = read(in, buffer, 1) > 0))
-	{
-		if (buffer[0] != '\n')
-			info[i] = buffer[0];
-		else
-			break ;
-		i++;
-	}
-	info[i] = '\0';
-	map_info = save_info(info);
-
-	i  = 0;
+	len  = 0;
 	first_line = 0;
-	while ((flag = read(in, buffer, 1) > 0))
+	while ((read(map_info->fd, buffer, 1) > 0))
 	{
 		if (first_line == 0)
 			first_line = ft_create_elem(buffer[0]);
@@ -309,26 +291,65 @@ int		ft_parse_argv()
 			ft_list_push_back(&first_line, buffer[0]);
 		else
 			break ;
+		len++;
+	}
+	map_info->first_line = *first_line;
+	return (len);
+}
+
+t_map_info	*ft_read_syms(const char *filename)
+{
+	int			fd;
+	t_map_info	*map_info;
+	int			i;
+	char		*info;
+	char		buffer[4242];
+
+	i = 0;
+	info = malloc(sizeof(char) * 20);
+	fd = open(filename, O_RDONLY);
+	if (-1 == fd)
+		return (t_map_info *)(0);
+	while ((read(fd, buffer, 1) > 0))
+	{
+		if (buffer[0] != '\n')
+			info[i] = buffer[0];
+		else
+			break ;
 		i++;
 	}
-	map_info->line_length = i;
-	/*
-	printf("size: %d\n", map_info->size);
-	printf("empty: %c\n", map_info->empty);
-	printf("obstacle: %c\n", map_info->obstacle);
-	printf("full: %c\n", map_info->full);
-	printf("line_length: %d\n", map_info->line_length);*/
-	converted_map = convert_map(*map_info, in, *first_line);
+	map_info = save_info(info);
+	map_info->fd = fd;
+	map_info->line_length =  ft_read_first_line(map_info);
+	info[i] = '\0';
+	return (map_info);
+}
+
+int		ft_parse_argv(const char *filename)
+{
+	t_map		**converted_map;
+	t_map_info	*map_info;
+
+	map_info = ft_read_syms(filename);
+	converted_map = convert_map(*map_info, map_info->fd, map_info->first_line);
 	print_t_map(converted_map, *map_info, *g_square);
-	close(flag);
-	close(in);
+
+
+	close(map_info->fd);
 	free(map_info);	
+	free(converted_map);
 	return (0);
 }
 
-int		main(void)
+int		main(int argc, char **argv)
 {
-	ft_parse_argv();
+	int		i;
 
+	i = 1;
+	while (i < argc)
+	{
+		ft_parse_argv(argv[i]);
+		i++;
+	}
 	return (0);
 }
