@@ -6,120 +6,13 @@
 /*   By: kpeng <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/03 15:09:38 by kpeng             #+#    #+#             */
-/*   Updated: 2018/09/04 00:37:25 by kpeng            ###   ########.fr       */
+/*   Updated: 2018/09/05 11:57:32 by kpeng            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <fcntl.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include "ft_headers.h"
+#include "ft_utils.h"
 
-
-typedef struct s_list
-{
-	char			data;
-	struct s_list	*next;
-}				t_list;
-
-typedef struct	s_map_info
-{
-	int		size;
-	int		line_length;
-	char	empty;
-	char 	obstacle;
-	char	full;
-	int		fd;
-	t_list	first_line;
-}				t_map_info;
-
-
-typedef	struct s_biggest
-{
-	int		row;
-	int		col;
-	int		dimension;
-}				t_biggest;
-
-typedef struct s_map
-{
-	int		num;
-	char 	sym;
-}				t_map;
-
-typedef struct s_map_set
-{
-	struct s_map 	 *map;
-	struct s_biggest *square;
-}				t_map_set;
-
-t_biggest	*g_square;
-
-/**util**/
-int		min(int	a, int	b, int c)
-{
-	if (a <= b && a <= c)
-		return a;
-	else if (b <= c && b <= a)
-		return b;
-	else
-		return c;
-}
-
-/**util**/
-t_list	*ft_create_elem(char data)
-{
-	t_list	*elem;
-
-	elem = malloc(sizeof(t_list));
-	if (elem != NULL)
-	{
-		elem->data = data;
-		elem->next = NULL;
-	}
-	return (elem);
-}
- 
-/**util**/
-void	ft_list_push_back(t_list **first_line, char data)
-{
-	t_list	*elem;
-
-	if (first_line && *first_line)
-	{
-		elem = *first_line;
-		while (elem->next != NULL)
-			elem = elem->next;
-		elem->next = ft_create_elem(data);
-	}
-	else
-		*first_line = ft_create_elem(data);
-}
-
-/**util**/
-void	ft_putchar(char c)
-{
-	write(1, &c, 1);
-}
-
-/**util**/
-int		ft_atoi(char *str, int	length)
-{
-	int		i;
-	int		num;
-
-	i = 0;
-	num = 0;
-	while (i < length)
-	{
-		num = num * 10 + (str[i] - '0');
-		i++;
-	}
-	return (num);
-}
-
-/**map util**/
 void	print_map(int **map, t_map_info info)
 {
 	int 	i;
