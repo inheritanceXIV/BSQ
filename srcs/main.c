@@ -43,7 +43,7 @@ t_map_info	*ft_read_syms(const char *filename)
 	return (map_info);
 }
 
-int		ft_parse_argv(const char *filename)
+int			ft_parse_argv(const char *filename)
 {
 	t_map_info	*map_info;
 	t_map_set	*map_set;
@@ -51,12 +51,12 @@ int		ft_parse_argv(const char *filename)
 	map_info = ft_read_syms(filename);
 	map_set = convert_map(*map_info, map_info->fd, map_info->first_line);
 	print_t_map(map_set->map, *map_info, *g_square);
-	free(map_info);	
+	free(map_info);
 	free(map_set->map);
 	return (0);
 }
 
-int		main(int argc, char **argv)
+int			main(int argc, char **argv)
 {
 	int		i;
 
@@ -65,6 +65,6 @@ int		main(int argc, char **argv)
 	{
 		ft_parse_argv(argv[i]);
 		i++;
-	}
+	}lseek
 	return (0);
 }

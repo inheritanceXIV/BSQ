@@ -13,11 +13,11 @@
 #include "../includes/ft_headers.h"
 #include "../includes/ft_utils.h"
 
-void	print_t_map(int **map, t_map_info info, t_biggest square)
+void		print_t_map(int **map, t_map_info info, t_biggest square)
 {
-	int 	i;
+	int		i;
 	int		j;
-	char 	*str;
+	char	*str;
 	int		index;
 	int		str_length;
 
@@ -53,8 +53,8 @@ t_map_info	*save_info(char *info_arr)
 
 	map_info = malloc(sizeof(t_map_info));
 	len = 0;
- 	while (info_arr[len] != 0)
- 		len++;
+	while (info_arr[len] != 0)
+		len++;
 	map_info->full = info_arr[len - 1];
 	map_info->obstacle = info_arr[len - 2];
 	map_info->empty = info_arr[len - 3];
@@ -62,13 +62,13 @@ t_map_info	*save_info(char *info_arr)
 	return (map_info);
 }
 
-int 		**find_square(int **int_map, t_map_info info, int fd)
+int			**find_square(int **int_map, t_map_info info, int fd)
 {
 	int			row;
 	int			col;
 	t_biggest	*square;
 	char		buffer[14242];
-	int 		dimension;
+	int			dimension;
 
 	square = malloc(sizeof(t_biggest));
 	square->row = -1;
@@ -76,18 +76,19 @@ int 		**find_square(int **int_map, t_map_info info, int fd)
 	while (row < info.size)
 	{
 		col = 0;
-		int_map[row]  = malloc(sizeof(int) * (info.line_length + 1));
+		int_map[row] = malloc(sizeof(int) * (info.line_length + 1));
 		read(fd, buffer, info.line_length + 1);
 		while (col < info.line_length)
 		{
 			if (col != 0 && buffer[col] == info.empty)
 			{
-				dimension = (min(int_map[row][col - 1], int_map[row - 1][col], int_map[row - 1][col - 1])) + 1;
-				int_map[row][col]= dimension;
+				dimension = (min(int_map[row][col - 1], \
+				int_map[row - 1][col], int_map[row - 1][col - 1])) + 1;
+				int_map[row][col] = dimension;
 				if (dimension >= square->dimension)
 				{
 					if (dimension > square->dimension \
-						|| (row <= square->row && col <= square-> col))
+						|| (row <= square->row && col <= square->col))
 					{
 						square->row = row;
 						square->col = col;
@@ -96,7 +97,7 @@ int 		**find_square(int **int_map, t_map_info info, int fd)
 				}
 			}
 			else
-				int_map[row][col] =  (buffer[col] == info.empty) ? 1 : 0;
+				int_map[row][col] = (buffer[col] == info.empty) ? 1 : 0;
 			col++;
 		}
 		int_map[row][col] = -1;
@@ -108,25 +109,25 @@ int 		**find_square(int **int_map, t_map_info info, int fd)
 
 t_map_set	*convert_map(t_map_info info, int fd, t_list first_line)
 {
-	char		buffer[14242];
+	char		buffer[50000];
 	t_map_set	*set;
-	int 		**int_map;
+	int			**int_map;
 	int			col;
 
-	buffer[0] = (col = 0);
+	buffer[0] = 0;
+	col = 0;
 	int_map = malloc(sizeof(int *) * info.size);
 	int_map[0] = malloc(sizeof(int) * (info.line_length + 1));
 	while (col < info.line_length)
 	{
 		int_map[0][col] = (first_line.data == info.empty) ? 1 : 0;
 		col++;
-		if (col!= info.line_length)
+		if (col != info.line_length)
 			first_line = *first_line.next;
 		else
 			break ;
 	}
 	int_map[0][col] = -1;
-
 	int_map = find_square(int_map, info, fd);
 	set = (t_map_set *)malloc(sizeof(t_map_set));
 	set->map = int_map;
@@ -134,14 +135,13 @@ t_map_set	*convert_map(t_map_info info, int fd, t_list first_line)
 	return (set);
 }
 
-
-int		ft_read_first_line(t_map_info *map_info)
+int			ft_read_first_line(t_map_info *map_info)
 {
 	int			len;
 	char		buffer[4242];
 	t_list		*first_line;
 
-	len  = 0;
+	len = 0;
 	first_line = 0;
 	while ((read(map_info->fd, buffer, 1) > 0))
 	{

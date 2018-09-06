@@ -12,14 +12,14 @@
 
 #include "../includes/ft_headers.h"
 
-int		min(int	a, int	b, int c)
+int		min(int a, int b, int c)
 {
 	if (a <= b && a <= c)
-		return a;
+		return (a);
 	else if (b <= c && b <= a)
-		return b;
+		return (b);
 	else
-		return c;
+		return (c);
 }
 
 t_list	*ft_create_elem(char data)
@@ -34,7 +34,7 @@ t_list	*ft_create_elem(char data)
 	}
 	return (elem);
 }
- 
+
 void	ft_list_push_back(t_list **first_line, char data)
 {
 	t_list	*elem;
@@ -55,7 +55,7 @@ void	ft_putchar(char c)
 	write(1, &c, 1);
 }
 
-int		ft_atoi(char *str, int	length)
+int		ft_atoi(char *str, int length)
 {
 	int		i;
 	int		num;
