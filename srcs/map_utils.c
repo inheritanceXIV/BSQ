@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   map_utils.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kpeng <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/09/03 15:09:38 by kpeng             #+#    #+#             */
-/*   Updated: 2018/09/05 12:23:57 by kpeng            ###   ########.fr       */
+/*   Created: 2018/09/05 21:48:20 by kpeng             #+#    #+#             */
+/*   Updated: 2018/09/05 21:48:26 by kpeng            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_headers.h"
-#include "ft_utils.h"
+#include "../includes/ft_headers.h"
+#include "../includes/ft_utils.h"
 
 void	print_t_map(int **map, t_map_info info, t_biggest square)
 {
@@ -46,31 +46,6 @@ void	print_t_map(int **map, t_map_info info, t_biggest square)
 	free(str);
 }
 
-char	**return_map(char buf[], int start_poi, int row, int line_length)
-{
-	char	**map;
-	int		i;
-	int		j;
-
-	i = 0;
-	map = (char **)malloc(sizeof(char *) * row + 1);
-	while (i < 10)
-	{
-		j = 0;
-		map[i] = (char *)malloc(sizeof(char) * line_length + 1);
-		while (j < line_length)
-		{
-			map[i][j] = buf[start_poi++];
-			j++;
-		}
-		start_poi++;
-		map[i][j] = '\0';
-		i++;
-	}
-	map[i] = (char *)(0);
-	return (map);
-}
-
 t_map_info	*save_info(char *info_arr)
 {
 	int			len;
@@ -87,42 +62,22 @@ t_map_info	*save_info(char *info_arr)
 	return (map_info);
 }
 
-int 		**get_int_map(t_map_info, )
-
-t_map_set	*convert_map(t_map_info info, int fd, t_list first_line)
+int 		**find_square(int **int_map, t_map_info info, int fd)
 {
 	int			row;
 	int			col;
-	char		buffer[14242];
-	int			flag;
 	t_biggest	*square;
-	t_map_set	*set;
-	int 		**int_map;
+	char		buffer[14242];
+	int 		dimension;
 
 	square = malloc(sizeof(t_biggest));
-	square->dimension = 0;
 	square->row = -1;
-	square->col = -1;
-	row = 0;
-	int_map = malloc(sizeof(int *) * info.size);
-	int_map[0] = malloc(sizeof(int) * (info.line_length + 1));
-	while (row < info.line_length)
-	{
-		int_map[0][row] = (first_line.data == info.empty) ? 1 : 0;
-		row++;
-		if (row != info.line_length)
-			first_line = *first_line.next;
-		else
-			break ;
-	}
-	int_map[0][row] = -1;
-
 	row = 1;
 	while (row < info.size)
 	{
 		col = 0;
 		int_map[row]  = malloc(sizeof(int) * (info.line_length + 1));
-		flag = read(fd, buffer, info.line_length + 1);
+		read(fd, buffer, info.line_length + 1);
 		while (col < info.line_length)
 		{
 			if (col != 0 && buffer[col] == info.empty)
@@ -148,9 +103,34 @@ t_map_set	*convert_map(t_map_info info, int fd, t_list first_line)
 		row++;
 	}
 	g_square = square;
+	return (int_map);
+}
+
+t_map_set	*convert_map(t_map_info info, int fd, t_list first_line)
+{
+	char		buffer[14242];
+	t_map_set	*set;
+	int 		**int_map;
+	int			col;
+
+	buffer[0] = (col = 0);
+	int_map = malloc(sizeof(int *) * info.size);
+	int_map[0] = malloc(sizeof(int) * (info.line_length + 1));
+	while (col < info.line_length)
+	{
+		int_map[0][col] = (first_line.data == info.empty) ? 1 : 0;
+		col++;
+		if (col!= info.line_length)
+			first_line = *first_line.next;
+		else
+			break ;
+	}
+	int_map[0][col] = -1;
+
+	int_map = find_square(int_map, info, fd);
 	set = (t_map_set *)malloc(sizeof(t_map_set));
 	set->map = int_map;
-	set->square = square;
+	set->square = g_square;
 	return (set);
 }
 
@@ -175,59 +155,4 @@ int		ft_read_first_line(t_map_info *map_info)
 	}
 	map_info->first_line = *first_line;
 	return (len);
-}
-
-t_map_info	*ft_read_syms(const char *filename)
-{
-	int			fd;
-	t_map_info	*map_info;
-	int			i;
-	char		*info;
-	char		buffer[4242];
-
-	i = 0;
-	info = malloc(sizeof(char) * 20);
-	fd = open(filename, O_RDONLY);
-	if (-1 == fd)
-		return (t_map_info *)(0);
-	while ((read(fd, buffer, 1) > 0))
-	{
-		if (buffer[0] != '\n')
-			info[i] = buffer[0];
-		else
-			break ;
-		i++;
-	}
-	info[i] = '\0';
-	map_info = save_info(info);
-	map_info->fd = fd;
-	map_info->line_length = ft_read_first_line(map_info);
-	return (map_info);
-}
-
-int		ft_parse_argv(const char *filename)
-{
-	t_map_info	*map_info;
-	t_map_set	*map_set;
-
-	map_info = ft_read_syms(filename);
-	map_set = convert_map(*map_info, map_info->fd, map_info->first_line);
-	print_t_map(map_set->map, *map_info, *g_square);
-	free(map_info);	
-	free(map_set->map);
-	return (0);
-}
-
-int		main(int argc, char **argv)
-{
-	int		i;
-	char    *str;
-
-	i = 1;
-	while (i < argc)
-	{
-		ft_parse_argv(argv[i]);
-		i++;
-	}
-	return (0);
 }

@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_headers.h"
+#include "../includes/ft_headers.h"
 
 int		min(int	a, int	b, int c)
 {
