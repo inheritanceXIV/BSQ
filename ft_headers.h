@@ -44,15 +44,9 @@ typedef	struct		s_biggest
 	int			dimension;
 }					t_biggest;
 
-typedef struct		s_map
-{
-	int		num;
-	char	sym;
-}					t_map;
-
 typedef struct		s_map_set
 {
-	struct s_map	 	*map;
+	void	 			*map;
 	struct s_biggest	*square;
 }					t_map_set;
 

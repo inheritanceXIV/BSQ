@@ -1,48 +1,31 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct s_list
+typedef struct guapi
 {
-	char			data;
-	struct s_list	*next;
-}				t_list;
-
-
-t_list	*ft_create_elem(char data)
-{
-	t_list	*elem;
-
-	elem = malloc(sizeof(t_list));
-	if (elem != NULL)
-	{
-		elem->data = data;
-		elem->next = NULL;
-	}
-	return (elem);
-}
- 
-void	ft_list_push_back(t_list **first_line, char data)
-{
-	t_list	*elem;
-
-	if (first_line && *first_line)
-	{
-		elem = *first_line;
-		while (elem->next != NULL)
-			elem = elem->next;
-		elem->next = ft_create_elem(data);
-	}
-	else
-		*first_line = ft_create_elem(data);
-}
+	char a;
+	char b;
+}			t_guapi;
 
 int main()
 {
-    t_list *first_line;
-    
-	first_line = ft_create_elem('b');
-    ft_list_push_back(&first_line, 'a');
-    printf("%c\n", first_line->data);
-
+   int i = 0;
+   int j = 0;
+	
+   t_guapi *gua = malloc(sizeof(t_guapi));
+   gua->a = 'a';
+   gua->b = 'b';
+   while ( i < 1000 )
+   {
+   		j  = 0;
+		while (j < 1000)
+		{
+			printf("%c", gua->a);
+			printf("%c", gua->b);
+			j++;
+		}
+		printf("\n");
+		i++;
+   }
     return 0;
 }
